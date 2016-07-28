@@ -1,0 +1,160 @@
+{
+    "title": "Configuration",
+    "type": "object",
+    "properties": {
+        "appId": {
+            "title": "App ID",
+            "type": "string",
+            "description": "Intercom application ID"
+        },
+        "#apiKey": {
+            "title": "API Key",
+            "type": "string",
+            "description": "Intercom API key"
+        },
+        "userColumnMapping": {
+            "title": "User columns mapping",
+            "type": "object",
+            "description": "Column mapping of user data",
+            "properties": {
+                "standardColumns": {
+                    "type": "array",
+                    "title": "Standard User attributes",
+                    "format": "table",
+                    "description": "Column mapping of standard User attributes",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object",
+                        "title": "Mapping",
+                        "properties": {
+                            "srcCol": {
+                                "type": "string",
+                                "title": "Source Column"
+                            },
+                            "destCol": {
+                                "type": "string",
+                                "title": "Standard User attribute",
+                                "enum": ["user_id", "email", "signed_up_at",
+                                    "name", "last_seen_ip", "last_seen_user_agent", "last_request_at",
+                                    "unsubscribed_from_emails", "update_last_request_at", "new_session"
+                                ]
+                            }
+
+                        },
+                        "required": [
+                            "destCol", "srcCol"
+                        ]
+
+
+                    }
+                },
+                "customColumns": {
+                    "type": "array",
+                    "title": "Custom User attributes",
+                    "format": "table",
+                    "description": "Column names mapping of custom User attributes.",
+                    "uniqueItems": true,
+                    "items": {
+                        "type": "object",
+                        "title": "Mapping",
+                        "properties": {
+                            "srcCol": {
+                                "type": "string",
+                                "title": "Source Column"
+                            },
+                            "destCol": {
+                                "type": "string",
+                                "title": "Intercom Column"
+                            },
+                            "dataType": {
+                                "type": "string",
+                                "title": "Attribute data type",
+                                "enum": ["Boolean", "Double", "Float", "Integer", "Long", "String"
+                                ],
+                                "default": "String"
+                            }
+
+                        },
+                        "required": [
+                            "destCol", "srcCol", "dataType"
+                        ]
+
+                    }
+                },
+                "companyColumnMapping": {
+                    "title": "Company attributes mapping",
+                    "type": "object",
+                    "description": "Mapping of company column names.",
+                    "properties": {
+                        "standardColumns": {
+                            "type": "array",
+                            "title": "Standard Company attributes",
+                            "format": "table",
+                            "description": "Column mapping of standard Company attributes",
+                            "uniqueItems": true,
+                            "items": {
+                                "type": "object",
+                                "title": "Mapping",
+                                "properties": {
+                                    "srcCol": {
+                                        "type": "string",
+                                        "title": "Source Column"
+                                    },
+                                    "destCol": {
+                                        "type": "string",
+                                        "title": "Standard Company attribute",
+                                        "enum": ["company_remote_created_at", "company_id", "company_name", "company_monthly_spend", "company_plan"
+                                        ]
+                                    }
+
+                                },
+                                "required": [
+                                    "destCol", "srcCol"
+                                ]
+
+
+                            }
+                        },
+                        "customColumns": {
+                            "type": "array",
+                            "title": "Custom Company attributes",
+                            "format": "table",
+                            "description": "Column names mapping of custom Company attributes.",
+                            "uniqueItems": true,
+                            "items": {
+                                "type": "object",
+                                "title": "Mapping",
+                                "properties": {
+                                    "srcCol": {
+                                        "type": "string",
+                                        "title": "Source Column"
+                                    },
+                                    "destCol": {
+                                        "type": "string",
+                                        "title": "Intercom Column"
+                                    },
+                                    "dataType": {
+                                        "type": "string",
+                                        "title": "Attribute data type",
+                                        "enum": ["Boolean", "Double", "Float", "Integer", "Long", "String"
+                                        ],
+                                        "default": "String"
+                                    }
+
+                                },
+                                "required": [
+                                    "destCol", "srcCol", "dataType"
+                                ]
+
+
+                            }
+                        }
+                    },
+                    "required": ["standardColumns", "customColumns"]
+                }
+            },
+            "required": ["standardColumns", "customColumns", "companyColumnMapping"]
+        }
+    },
+    "required": ["userColumnMapping"]
+}
