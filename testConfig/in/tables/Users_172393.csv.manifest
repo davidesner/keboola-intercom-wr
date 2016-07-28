@@ -1,0 +1,21 @@
+{
+    "id": "in.c-ares-test.test_data",
+    "uri": "https:\/\/connection.keboola.com\/\/v2\/storage\/tables\/in.c-ares-test.test_data",
+    "name": "test_data",
+    "primary_key": [
+        "ic"
+    ],
+    "indexed_columns": [
+        "ic"
+    ],
+    "created": "2016-04-08T08:47:09+0200",
+    "last_change_date": "2016-04-10T15:37:34+0200",
+    "last_import_date": "2016-04-08T08:47:10+0200",
+    "rows_count": 100,
+    "data_size_bytes": 32768,
+    "is_alias": false,
+    "columns": [
+        "IC"
+    ],
+    "attributes": []
+}

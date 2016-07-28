@@ -1,0 +1,58 @@
+{
+    "storage": {
+        "input": {
+            "tables": [{
+                    "source": "in.c-ares-test.test_data",
+                    "destination": "Users_172393.csv",
+                    "limit": 50,
+                    "columns": [],
+                    "where_values": [],
+                    "where_operator": "eq"
+                }],
+            "files": []
+        },
+        "output": {
+            "tables": [],
+            "files": []
+        }
+    },
+    "parameters":{
+  "appId": "kk",
+  "#apiKey": "123456",
+  "userColumnMapping": {
+    "standardColumns": [
+     
+      {
+        "srcCol": "Name",
+        "destCol": "name"
+      }
+    ],
+    "customColumns": [
+      {
+        "srcCol": "First name",
+        "destCol": "test_attr",
+                "dataType": "String",
+        "companyColumnMapping": {
+          "standardColumns": null,
+          "customColumns": null
+        }
+      }
+    ],
+    
+    "companyColumnMapping": {
+      "standardColumns": [
+        {
+          "srcCol": "Company ID",
+          "destCol": "company_id"
+        },
+        {
+          "srcCol": "Company name",
+          "destCol": "company_name"
+        }
+      ],
+      "customColumns": []
+    }
+  }
+},
+    "image_parameters": []
+}
