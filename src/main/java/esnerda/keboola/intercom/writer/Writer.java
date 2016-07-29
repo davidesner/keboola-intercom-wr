@@ -46,13 +46,13 @@ public class Writer {
     private final static long MAX_RUN_TIME = 9000;
     //milis between jobStatus refresh request
     private final static long REQ_WAIT_INTERVAL = 1000;
-
+    
     static KBCLogger logger = new DefaultLogger(Writer.class);
-
+    
     public static void main(String[] args) {
-
+        
         startCounter();
-
+        
         if (args.length == 0) {
             System.out.print("No parameters provided.");
             System.exit(1);
@@ -105,7 +105,7 @@ public class Writer {
                 } else {
                     logger.warning("Collecting results finished. " + jobIds.size() + " jobs from last run were not collected. Remaining finished with " + failedJobs.getItems().size() + " errors.");
                 }
-
+                
             }
 
             /*Proccess input table*/
@@ -121,7 +121,7 @@ public class Writer {
             logger.info("Submiting User bulk jobs.");
             UserBulkJobRequest userReq = new UserBulkJobRequest();
             Map<String, String> userData = new HashMap();
-
+            
             while ((userData = csvreader.read(header)) != null) {
                 try {
                     if (!userReq.isFull()) {
@@ -171,7 +171,7 @@ public class Writer {
                     } catch (FailedItemsCollection.IllegalValueException ex1) {
                         logger.warning("Unable to store failed row. ");
                     }
-
+                    
                 }
             }//END send data
             try {
@@ -214,7 +214,7 @@ public class Writer {
             } catch (FailedItemsCollection.IllegalValueException ex) {
                 logger.error(ex.getMessage());
             }
-
+            
         } catch (KBCException ex) {
             if (ex.getSeverity() == 0) {
                 logger.log(ex);
@@ -241,21 +241,22 @@ public class Writer {
 
             /*write error results table*/
             try {
-
+                
                 if (!failedJobs.isEmpty()) {
                     File failedJobsCsv = failedJobs.saveToCsv(handler.getOutputTablesPath());
-                    handler.writeManifestFile(new ManifestFile.Builder(failedJobsCsv.getName(), handler.getOutputTablesPath()).build());
+                    handler.writeManifestFile(new ManifestFile.Builder(failedJobsCsv.getName(), handler.getOutputTablesPath())
+                            .setPrimaryKey(new String[]{"user_id", "job_run_timestamp"}).setIncrementalLoad(true).build());
                     logger.warning("Task completed with " + failedJobs + " errors. Failed rows stored in user_errors.csv table.");
                 }
-
+                
                 if (jobIds.isEmpty()) {
                     logger.info("All tasks completed successfuly");
                 } else {
                     logger.warning(jobIds.size() + " jobs have not finished within the time limit. Results will be collected on the next run.");
                 }
-
+                
                 if (csvreader != null) {
-
+                    
                     csvreader.close();
                 }
             } catch (IOException ex) {
@@ -263,17 +264,17 @@ public class Writer {
             } catch (KBCException ex) {
                 logger.error(ex.getDetailedMessage());
             } catch (RuntimeException ex) {
-
+                
             }
         }
     }
-
+    
     private static long START_TIME;
-
+    
     private static void startCounter() {
         START_TIME = Instant.now().getEpochSecond();
     }
-
+    
     private static long getRuntime() {
         return Instant.now().getEpochSecond() - START_TIME;
     }

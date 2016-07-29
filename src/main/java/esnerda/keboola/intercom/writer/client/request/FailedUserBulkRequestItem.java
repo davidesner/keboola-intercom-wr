@@ -30,7 +30,7 @@ public class FailedUserBulkRequestItem extends FailedBulkRequestItem {
         this.parametersMap.put("email", u.getEmail());
         this.parametersMap.put("name", u.getName());
         this.parametersMap.put("type", u.getType());
-        this.parametersMap.put("extraction_run_time", Instant.ofEpochSecond(data.getUpdatedAt()));
+        this.parametersMap.put("job_run_timestamp", Instant.ofEpochSecond(data.getUpdatedAt()));
         if (u.getCustomAttributes() != null) {
             for (Entry<String, CustomAttribute> e : u.getCustomAttributes().entrySet()) {
                 if (e.getValue() != null) {
