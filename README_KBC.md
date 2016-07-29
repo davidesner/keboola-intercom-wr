@@ -19,7 +19,7 @@ Records which failed to be updated will be stored in output table `user_errors.c
  - **App ID** – *(REQ)* your Intercom application ID
  - **API Key** – *(REQ)* Intercom API key.
  - **User column mapping** – *(REQ)* Specify column name mapping of your source table to match Intercom user attributes.
-	 - **Standard User attributes ** – specify column name mapping to match the standard Intercom User attributes. If standard attributes mapping is not specified, app will expect to find default attribute names in the input. Note that `user_id` attribute is required.
+	 - **Standard User attributes** – specify column name mapping to match the standard Intercom User attributes. If standard attributes mapping is not specified, app will expect to find default attribute names in the input. Note that `user_id` attribute is required.
 	 - **Custom User attributes** –  specify mapping for User custom attributes. All custom attributes must be specified in order to update them. ***NOTE*:** Be careful when defining the attribute names, they must match exactly the attribute names in your Intercom model, if not, new custom attribute will be created!
 	 - **Company attributes mapping** – *(OPT)* Standard and Custom attributes of Intercom Company model. Each user is allowed to belong to one company. Same rules as for User mapping applies. Required standard attribute is `company_id`.
 
