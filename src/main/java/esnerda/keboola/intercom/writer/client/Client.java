@@ -109,8 +109,37 @@ public class Client {
 
         Job job = getJobById(jobId);
         List<JobItem<User>> failedUItems = new ArrayList();
+        boolean success = false;
+        int retries = 0;
+        JobItemCollection jc = null;
+        while (!success && retries <= RETRIES) {
+            try {
+                if (Intercom.getRateLimitDetails().canSubmit()) {
+                    jc = User.listJobErrorFeed(job.getID());
+                    success = true;
+                }
+            } catch (RateLimitException rex) {
+                waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
+                retries++;
+            } catch (AuthorizationException ex) {
+                throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Authorization error, check your credentials!");
+            } catch (ServerException ex) {
+                waitNmilis(BACKOFF_INTERVAL);
+                retries++;
+            } catch (io.intercom.api.ClientException | InvalidException ex) {
+                throw new ClientException(1, ex.getMessage(), ex.getErrorCollection(), "Unable to submit job!");
+            } catch (IntercomException ex) {
+                if (retries >= RETRIES - 1) {
+                    throw new ClientException(1, ex.getMessage(), ex.getErrorCollection(), "Unable to submit job after several tries!");
+                }
+                waitNmilis(BACKOFF_INTERVAL);
+                retries++;
+            }
+        }
 
-        JobItemCollection jc = User.listJobErrorFeed(job.getID());
+        if (jc == null) {
+            throw new ClientException(1, "Unable to retrieve error feed, requests failed after " + RETRIES + " retries.", null, "Unable to submit job!");
+        }
         failedUItems.addAll(jc.getPage());
         while (jc.hasNextPage()) {
             failedUItems.addAll(jc.nextPage().getPage());
