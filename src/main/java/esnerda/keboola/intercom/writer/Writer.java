@@ -43,9 +43,9 @@ import org.supercsv.prefs.CsvPreference;
 public class Writer {
 
     //max run time before give up result collection (Seconds)
-    private final static long MAX_RUN_TIME = 10800;
+    private final static long MAX_RUN_TIME = 9000;
     //milis between jobStatus refresh request
-    private final static long REQ_WAIT_INTERVAL = 10000;
+    private final static long REQ_WAIT_INTERVAL = 1000;
 
     static KBCLogger logger = new DefaultLogger(Writer.class);
 
@@ -265,13 +265,6 @@ public class Writer {
             } catch (RuntimeException ex) {
 
             }
-        }
-    }
-
-    private static void waitNmilis(long waitInterval) {
-        try {
-            Thread.sleep(waitInterval);
-        } catch (Exception ex) {
         }
     }
 
