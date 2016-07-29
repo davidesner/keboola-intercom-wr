@@ -23,10 +23,10 @@ Records which failed to be updated will be stored in output table `user_errors.c
 	 - **Custom User attributes** –  specify mapping for User custom attributes. All custom attributes must be specified in order to update them. ***NOTE*:** Be careful when defining the attribute names, they must match exactly the attribute names in your Intercom model, if not, new custom attribute will be created!
 	 - **Company attributes mapping – ***(OPT)* Standard and Custom attributes of Intercom Company model. Each user is allowed to belong to one company. Same rules as for User mapping applies. Required standard attribute is `company_id`.
 
-**Input**
+##Input
 Input table with Intercom User data.
 
-**Output**
+##Output
 `default_bucket.user_error.csv` containing records which failed to update.
 
 ##Sample configurations / use cases
