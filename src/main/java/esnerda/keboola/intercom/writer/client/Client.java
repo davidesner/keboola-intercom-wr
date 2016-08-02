@@ -144,6 +144,7 @@ public class Client {
                 if (retries >= RETRIES - 1) {
                     throw new ClientException(1, ex.getMessage(), ex.getErrorCollection(), "Unable to submit job after several tries!");
                 }
+
                 waitNmilis(BACKOFF_INTERVAL);
                 retries++;
             }
@@ -221,6 +222,7 @@ public class Client {
                     retries++;
                 }
             } else {
+                System.out.println("waiting for: " + Long.toString(Intercom.getRateLimitDetails().getRemainingMilis() + 1));
                 lastException += Intercom.getRateLimitDetails();
                 //wait until rate limit renewed
                 waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
