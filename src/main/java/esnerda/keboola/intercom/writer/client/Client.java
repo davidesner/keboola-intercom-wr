@@ -60,6 +60,7 @@ public class Client {
      * @throws ClientException
      */
     public String submitUserBulkJobRequest(UserBulkJobRequest req) throws ClientException {
+        String lastException = "";
         Job job = null;
         boolean success = false;
         int retries = 0;
@@ -87,18 +88,20 @@ public class Client {
                     if (retries >= RETRIES - 1) {
                         throw new ClientException(1, ex.getMessage(), ex.getErrorCollection(), "Unable to submit job after several tries!");
                     }
+
                     waitNmilis(BACKOFF_INTERVAL);
                     retries++;
                 }
 
             } else {
+                lastException += Intercom.getRateLimitDetails();
                 //wait until rate limit renewed
                 waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
                 retries++;
             }
         }
         if (job == null) {
-            throw new ClientException(1, "Unable to sumbit job, requests failed after " + RETRIES + " retries.", null, "Unable to submit job!");
+            throw new ClientException(1, "Unable to sumbit job, requests failed after " + RETRIES + " retries. " + lastException, null, "Unable to submit job!");
         }
         return job.getID();
 
@@ -118,6 +121,11 @@ public class Client {
                 if (Intercom.getRateLimitDetails().canSubmit()) {
                     jc = User.listJobErrorFeed(job.getID());
                     success = true;
+                } else {
+                    lastException += Intercom.getRateLimitDetails();
+                    //wait until rate limit renewed
+                    waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
+                    retries++;
                 }
             } catch (RateLimitException rex) {
                 lastException += rex.getMessage();
@@ -213,6 +221,7 @@ public class Client {
                     retries++;
                 }
             } else {
+                lastException += Intercom.getRateLimitDetails();
                 //wait until rate limit renewed
                 waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
                 retries++;

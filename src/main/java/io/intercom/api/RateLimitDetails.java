@@ -83,4 +83,10 @@ public class RateLimitDetails {
         return remaining;
     }
 
+    @Override
+    public String toString() {
+        refreshIfNeeded();
+        return "limit: " + limit + "\nremaining: " + remaining + "\nremaining milis: " + getRemainingMilis() + "\nreset at: " + reset_at;
+    }
+
 }
