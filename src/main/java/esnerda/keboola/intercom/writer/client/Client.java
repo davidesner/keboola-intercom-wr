@@ -180,7 +180,7 @@ public class Client {
     private Job getJobById(String id) throws ClientException {
         boolean success = false;
         int retries = 0;
-
+        String lastException = "";
         Job job = null;
 
         while (!success && retries <= RETRIES) {
@@ -189,16 +189,19 @@ public class Client {
                     job = Job.find(id);
                     success = true;
                 } catch (RateLimitException rex) {
+                    lastException += rex.getMessage();
                     waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
                     retries++;
                 } catch (AuthorizationException ex) {
                     throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Authorization error, check your credentials!");
                 } catch (ServerException ex) {
+                    lastException += ex.getMessage();
                     waitNmilis(BACKOFF_INTERVAL);
                     retries++;
                 } catch (io.intercom.api.ClientException | InvalidException ex) {
                     throw new ClientException(1, ex.getMessage(), ex.getErrorCollection(), "Unable to retrieve job info!");
                 } catch (IntercomException ex) {
+                    lastException += ex.getMessage();
                     if (retries >= RETRIES - 1) {
                         throw new ClientException(1, ex.getMessage(), ex.getErrorCollection(), "Unable to retrieve job info after several tries!");
                     }
