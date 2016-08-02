@@ -49,7 +49,7 @@ public class FailedItemsCollection {
     }
 
     public void addAllBulkJob(UserBulkJobRequest c) throws IllegalValueException {
-        if (!c.getItems().isEmpty()) {
+        if (c.getItems() != null && !c.getItems().isEmpty()) {
             c.getItems().stream().forEach((i) -> {
                 items.add(new FailedUserBulkRequestItem(i));
 

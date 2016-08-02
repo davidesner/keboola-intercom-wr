@@ -149,7 +149,7 @@ public class Writer {
                                     .build());
                         } catch (ClientException ex) {
                             if (ex.getSeverity() < 2) {
-                                logger.log(ex.getSeverity(), ex.getMessage());
+                                logger.log(ex.getSeverity(), ex.getDetailedMessage());
                                 try {
                                     //collect failed jobs
                                     failedJobs.addAllBulkJob(userReq);
