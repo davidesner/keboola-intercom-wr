@@ -105,6 +105,7 @@ public class Client {
     }
 
     public List<FailedBulkRequestItem> getFailedUserJobItems(String jobId) throws ClientException {
+        String lastException = "";
         List<FailedBulkRequestItem> failedItems = new ArrayList<>();
 
         Job job = getJobById(jobId);
@@ -119,16 +120,19 @@ public class Client {
                     success = true;
                 }
             } catch (RateLimitException rex) {
+                lastException += rex.getMessage();
                 waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
                 retries++;
             } catch (AuthorizationException ex) {
                 throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Authorization error, check your credentials!");
             } catch (ServerException ex) {
+                lastException += ex.getMessage();
                 waitNmilis(BACKOFF_INTERVAL);
                 retries++;
             } catch (io.intercom.api.ClientException | InvalidException ex) {
                 throw new ClientException(1, ex.getMessage(), ex.getErrorCollection(), "Unable to submit job!");
             } catch (IntercomException ex) {
+                lastException += ex.getMessage();
                 if (retries >= RETRIES - 1) {
                     throw new ClientException(1, ex.getMessage(), ex.getErrorCollection(), "Unable to submit job after several tries!");
                 }
@@ -138,7 +142,7 @@ public class Client {
         }
 
         if (jc == null) {
-            throw new ClientException(1, "Unable to retrieve error feed, requests failed after " + RETRIES + " retries.", null, "Unable to submit job!");
+            throw new ClientException(1, "Unable to retrieve error feed, requests failed after " + RETRIES + " retries. " + lastException, null, "Unable to submit job!");
         }
         failedUItems.addAll(jc.getPage());
         while (jc.hasNextPage()) {
@@ -216,7 +220,7 @@ public class Client {
         }
 
         if (job == null) {
-            throw new ClientException(1, "Unable to send request (Job state),failed after " + RETRIES + " retries.", null, "Unable to send request!");
+            throw new ClientException(1, "Unable to send request (Job state),failed after " + RETRIES + " retries. " + lastException, null, "Unable to send request!");
         }
         return job;
     }
