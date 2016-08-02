@@ -93,7 +93,7 @@ public class Writer {
                 jobIds.addAll(lastState.getUnfinishedUserJobIds());
                 try {
                     failedJobs.addAll(
-                            client.waitAndCollectResults(jobIds, 240000, 0)
+                            client.waitAndCollectResults(jobIds, 240, 0)
                     );
                 } catch (ClientException ex) {
                     logger.warning(ex.getDetailedMessage());

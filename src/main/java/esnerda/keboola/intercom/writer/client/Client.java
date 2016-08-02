@@ -49,7 +49,7 @@ public class Client {
         Intercom.setAppID(appId);
         Intercom.setApiKey(apiKey);
         Logger logger = (Logger) LoggerFactory.getLogger("intercom-java");
-        LoggerContext.getContext().getConfiguration().getRootLogger().setLevel(org.apache.logging.log4j.Level.ALL);
+        LoggerContext.getContext().getConfiguration().getRootLogger().setLevel(org.apache.logging.log4j.Level.OFF);
     }
 
     /**
@@ -155,15 +155,15 @@ public class Client {
         //TODO: proccess and return job errors;
     }
 
-    public List<FailedBulkRequestItem> waitAndCollectResults(List<String> jobIds, long runTimeMilis, long waitIntervalMilis) throws ClientException {
+    public List<FailedBulkRequestItem> waitAndCollectResults(List<String> jobIds, long runTimeSeconds, long waitIntervalMilis) throws ClientException {
         List<FailedBulkRequestItem> failedJobs = new ArrayList<>();
         Iterator<String> jobIter;
-        long tStart = System.currentTimeMillis();
-        while (!jobIds.isEmpty() && (System.currentTimeMillis() - tStart) < runTimeMilis) {
+        long tStart = System.currentTimeMillis() / 1000;
+        while (!jobIds.isEmpty() && (System.currentTimeMillis() / 1000 - tStart) < runTimeSeconds) {
 
             jobIter = jobIds.iterator();
             String jobId;
-            while (jobIter.hasNext() && (System.currentTimeMillis() - tStart) < runTimeMilis) {
+            while (jobIter.hasNext() && (System.currentTimeMillis() / 1000 - tStart) < runTimeSeconds) {
                 jobId = jobIter.next();
                 //wait between each check
                 waitNmilis(waitIntervalMilis);
