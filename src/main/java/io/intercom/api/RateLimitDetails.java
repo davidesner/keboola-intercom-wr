@@ -65,7 +65,7 @@ public class RateLimitDetails {
      * Reset rate limit if needed
      */
     private void refreshIfNeeded() {
-        if (getRemainingSeconds() < 0) {
+        if (getRemainingSeconds() <= 0) {
             RateLimitDetails.remaining = limit;
         }
     }
@@ -86,7 +86,7 @@ public class RateLimitDetails {
     @Override
     public String toString() {
         refreshIfNeeded();
-        return "limit: " + limit + "\nremaining: " + remaining + "\nremaining milis: " + getRemainingMilis() + "\nreset at: " + reset_at;
+        return "\nlimit: " + limit + "\nremaining: " + remaining + "\nremaining milis: " + getRemainingMilis() + "\nreset at: " + reset_at;
     }
 
 }
