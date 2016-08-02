@@ -156,5 +156,5 @@
             "required": ["standardColumns", "customColumns", "companyColumnMapping"]
         }
     },
-    "required": ["userColumnMapping"]
+    "required": ["userColumnMapping", "appId", "#apiKey"]
 }
