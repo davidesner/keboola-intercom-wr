@@ -94,7 +94,7 @@ public class Client {
                 }
 
             } else {
-                lastException += Intercom.getRateLimitDetails();
+                lastException = Intercom.getRateLimitDetails().toString();
                 //wait until rate limit renewed
                 waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
                 retries++;
@@ -122,25 +122,25 @@ public class Client {
                     jc = User.listJobErrorFeed(job.getID());
                     success = true;
                 } else {
-                    lastException += Intercom.getRateLimitDetails();
+                    lastException = Intercom.getRateLimitDetails().toString();
                     //wait until rate limit renewed
                     waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
                     retries++;
                 }
             } catch (RateLimitException rex) {
-                lastException += rex.getMessage();
+                lastException = rex.getMessage();
                 waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
                 retries++;
             } catch (AuthorizationException ex) {
                 throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Authorization error, check your credentials!");
             } catch (ServerException ex) {
-                lastException += ex.getMessage();
+                lastException = ex.getMessage();
                 waitNmilis(BACKOFF_INTERVAL);
                 retries++;
             } catch (io.intercom.api.ClientException | InvalidException ex) {
                 throw new ClientException(1, ex.getMessage(), ex.getErrorCollection(), "Unable to submit job!");
             } catch (IntercomException ex) {
-                lastException += ex.getMessage();
+                lastException = ex.getMessage();
                 if (retries >= RETRIES - 1) {
                     throw new ClientException(1, ex.getMessage(), ex.getErrorCollection(), "Unable to submit job after several tries!");
                 }
@@ -202,19 +202,19 @@ public class Client {
                     job = Job.find(id);
                     success = true;
                 } catch (RateLimitException rex) {
-                    lastException += rex.getMessage();
+                    lastException = rex.getMessage();
                     waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
                     retries++;
                 } catch (AuthorizationException ex) {
                     throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Authorization error, check your credentials!");
                 } catch (ServerException ex) {
-                    lastException += ex.getMessage();
+                    lastException = ex.getMessage();
                     waitNmilis(BACKOFF_INTERVAL);
                     retries++;
                 } catch (io.intercom.api.ClientException | InvalidException ex) {
                     throw new ClientException(1, ex.getMessage(), ex.getErrorCollection(), "Unable to retrieve job info!");
                 } catch (IntercomException ex) {
-                    lastException += ex.getMessage();
+                    lastException = ex.getMessage();
                     if (retries >= RETRIES - 1) {
                         throw new ClientException(1, ex.getMessage(), ex.getErrorCollection(), "Unable to retrieve job info after several tries!");
                     }
@@ -223,9 +223,9 @@ public class Client {
                 }
             } else {
                 System.out.println("waiting for: " + Long.toString(Intercom.getRateLimitDetails().getRemainingMilis() + 1));
-                lastException += Intercom.getRateLimitDetails();
+                lastException = Intercom.getRateLimitDetails().toString();
                 //wait until rate limit renewed
-                waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
+                waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1000);
                 retries++;
             }
         }
