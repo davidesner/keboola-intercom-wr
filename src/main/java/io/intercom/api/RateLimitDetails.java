@@ -19,6 +19,7 @@ public class RateLimitDetails {
     private static long reset_at = 0;
 
     protected void updateLimit(int limit, int remaining, long reset_at) {
+        System.out.println("updating limit. values limit" + limit + " remains" + remaining + " reset_at" + RateLimitDetails.reset_at);
         RateLimitDetails.limit = limit;
         RateLimitDetails.remaining = remaining;
         RateLimitDetails.reset_at = reset_at;
