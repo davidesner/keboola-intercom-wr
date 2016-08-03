@@ -48,8 +48,8 @@ public class Client {
     public Client(String appId, String apiKey) {
         Intercom.setAppID(appId);
         Intercom.setApiKey(apiKey);
-        Logger logger = (Logger) LoggerFactory.getLogger("intercom-java");
-        LoggerContext.getContext().getConfiguration().getRootLogger().setLevel(org.apache.logging.log4j.Level.OFF);
+
+        LoggerContext.getContext().getLogger("intercom-java").setLevel(Level.OFF);
     }
 
     /**

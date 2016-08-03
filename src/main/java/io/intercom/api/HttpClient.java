@@ -201,7 +201,8 @@ class HttpClient {
         try {
             if (logger.isDebugEnabled()) {
                 final String text = CharStreams.toString(new InputStreamReader(entityStream));
-                logger.debug("api server response status[{}] --\n{}\n-- ", responseCode, text);
+//seru na to!                
+//logger.debug("api server response status[{}] --\n{}\n-- ", responseCode, text);
                 return objectMapper.readValue(text, javaType);
             } else {
                 return objectMapper.readValue(entityStream, javaType);
