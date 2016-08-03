@@ -47,6 +47,7 @@ public class RateLimitDetails {
         if (reset_at != 0) {
             remains = 1000 * (Instant.ofEpochSecond(reset_at).getEpochSecond() - Instant.now().getEpochSecond());
         }
+        System.out.println("Remains is : " + remains);
         return remains;
     }
 
