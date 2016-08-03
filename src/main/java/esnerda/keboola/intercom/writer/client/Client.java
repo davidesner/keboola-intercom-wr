@@ -222,7 +222,6 @@ public class Client {
                     retries++;
                 }
             } else {
-                System.out.println("waiting for: " + Long.toString(Intercom.getRateLimitDetails().getRemainingMilis() + 1));
                 lastException = Intercom.getRateLimitDetails().toString();
                 //wait until rate limit renewed
                 waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1000);
@@ -345,11 +344,6 @@ public class Client {
 //            } catch (InterruptedException ex) {
 //                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
 //            }
-            System.out.println("Job updated at " + Instant.ofEpochSecond(job.getUpdatedAt()).toString());
-            System.out.println("Job status: " + job.getState());
-            System.out.println("Current limit: " + Intercom.getRateLimitDetails().getLimit());
-            System.out.println("Remaining limit: " + Intercom.getRateLimitDetails().getRemaining());
-            System.out.println("Limit reset in: " + Intercom.getRateLimitDetails().getRemainingSeconds() + " seconds");
 
 //            if (tasks != null) {
 //                for (JobTask task : tasks) {

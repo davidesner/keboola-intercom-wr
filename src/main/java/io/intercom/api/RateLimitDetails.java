@@ -3,8 +3,6 @@
 package io.intercom.api;
 
 import java.time.Instant;
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 
 /**
  * Class maintaining the APIs rate limit details;
@@ -19,8 +17,6 @@ public class RateLimitDetails {
     private static long reset_at = 0;
 
     protected void updateLimit(int limit, int remaining, long reset_at) {
-        System.out.println("updating limit. values limit" + limit + " remains" + remaining + " reset_at" + RateLimitDetails.reset_at);
-        RateLimitDetails.limit = limit;
         RateLimitDetails.remaining = remaining;
         RateLimitDetails.reset_at = reset_at;
     }
@@ -48,8 +44,6 @@ public class RateLimitDetails {
         if (reset_at != 0) {
             remains = 1000 * (Instant.ofEpochSecond(reset_at).getEpochSecond() - Instant.now().getEpochSecond());
         }
-        System.out.println("Remains is : " + remains);
-        System.out.println("Limit is : " + limit);
         return remains;
     }
 
@@ -61,7 +55,11 @@ public class RateLimitDetails {
     public boolean canSubmit() {
         refreshIfNeeded();
         long remains = this.getRemainingMilis();
-        return (RateLimitDetails.remaining > 1) && (remains > 10);
+        if (RateLimitDetails.remaining > 1) {
+            return true;
+        } else {
+            return remains <= 1;
+        }
     }
 
     /**
@@ -69,7 +67,6 @@ public class RateLimitDetails {
      */
     private void refreshIfNeeded() {
         if (getRemainingSeconds() <= 0) {
-            System.out.println("Refreshing limit");
             RateLimitDetails.remaining = limit;
         }
     }
