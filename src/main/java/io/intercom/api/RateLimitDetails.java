@@ -48,6 +48,7 @@ public class RateLimitDetails {
             remains = 1000 * (Instant.ofEpochSecond(reset_at).getEpochSecond() - Instant.now().getEpochSecond());
         }
         System.out.println("Remains is : " + remains);
+        System.out.println("Limit is : " + limit);
         return remains;
     }
 
@@ -67,6 +68,7 @@ public class RateLimitDetails {
      */
     private void refreshIfNeeded() {
         if (getRemainingSeconds() <= 0) {
+            System.out.println("Refreshing limit");
             RateLimitDetails.remaining = limit;
         }
     }
