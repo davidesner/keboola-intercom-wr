@@ -267,6 +267,8 @@ public class Client {
             //wait until rate limit renewed
             Thread.sleep(interval);
         } catch (InterruptedException | RuntimeException ex) {
+            LoggerFactory.getLogger(this.getClass()).warn("Thread sleep failed " + ex.getMessage());
+
         }
     }
 

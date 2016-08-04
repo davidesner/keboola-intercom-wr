@@ -55,10 +55,10 @@ public class RateLimitDetails {
     public boolean canSubmit() {
         refreshIfNeeded();
         long remains = this.getRemainingMilis();
-        if (RateLimitDetails.remaining > 1) {
+        if (RateLimitDetails.remaining > 2) {
             return true;
         } else {
-            return remains <= 1;
+            return remains <= 0;
         }
     }
 
