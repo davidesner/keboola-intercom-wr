@@ -65,6 +65,7 @@ public class Writer {
         List<String> jobIds = new ArrayList();
         FailedItemsCollection failedJobs = new FailedItemsCollection("User");
         File usersInput = null;
+
         try {
             handler = ConfigHandlerBuilder.create(IntercomWrParameters.class)
                     .hasInputTables(true)
@@ -80,6 +81,7 @@ public class Writer {
             System.err.print(ex.getDetailedMessage());
             System.exit(1);
         }
+        int unproccessedJobsCount = 0;
         try {
             Client client = new Client(confParams.getAppId(), confParams.getApiKey());
 
@@ -107,7 +109,8 @@ public class Writer {
                 }
 
             }
-
+            //how many jobs still not finished?
+            unproccessedJobsCount = jobIds.size();
             /*Proccess input table*/
             csvreader = new CsvMapReader(new FileReader(usersInput), CsvPreference.STANDARD_PREFERENCE);
             // get header
@@ -201,7 +204,7 @@ public class Writer {
                 }
             }
 //            jobIds.add("job_30738a3a_5424_11e6_9850_795173bba9ec");
-            logger.info(jobIds.size() + " bulk jobs successfuly submited.");
+            logger.info((jobIds.size() - unproccessedJobsCount) + " bulk jobs successfuly submited.");
 
             /*Retrieve results*/
             logger.info("Retrieving results.");
@@ -252,7 +255,7 @@ public class Writer {
                 if (jobIds.isEmpty()) {
                     logger.info("All tasks completed successfuly");
                 } else {
-                    logger.warning(jobIds.size() + " jobs have not finished within the time limit. Results will be collected on the next run.");
+                    logger.warning((jobIds.size() + unproccessedJobsCount) + " jobs have not finished within the time limit. Results will be collected on the next run.");
                 }
 
                 if (csvreader != null) {
