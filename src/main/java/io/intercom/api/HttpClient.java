@@ -135,7 +135,7 @@ class HttpClient {
         try {
             stream = conn.getOutputStream();
             if (logger.isDebugEnabled()) {
-                logger.info(String.format("api server request --\n%s\n-- ", objectMapper.writeValueAsString(entity)));
+                //logger.info(String.format("api server request --\n%s\n-- ", objectMapper.writeValueAsString(entity)));
             }
             objectMapper.writeValue(stream, entity);
         } finally {

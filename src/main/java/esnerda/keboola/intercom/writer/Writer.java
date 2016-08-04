@@ -207,7 +207,7 @@ public class Writer {
             logger.info("Retrieving results.");
             try {
                 failedJobs.addAll(
-                        client.waitAndCollectResults(jobIds, MAX_RUN_TIME - getRuntime() - 5000, REQ_WAIT_INTERVAL)
+                        client.waitAndCollectResults(jobIds, MAX_RUN_TIME - getRuntime(), REQ_WAIT_INTERVAL)
                 );
             } catch (ClientException ex) {
                 logger.warning(ex.getDetailedMessage());
