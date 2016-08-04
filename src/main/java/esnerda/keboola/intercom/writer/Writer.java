@@ -246,7 +246,7 @@ public class Writer {
                     File failedJobsCsv = failedJobs.saveToCsv(handler.getOutputTablesPath());
                     handler.writeManifestFile(new ManifestFile.Builder(failedJobsCsv.getName(), handler.getOutputTablesPath())
                             .setPrimaryKey(new String[]{"user_id", "job_run_timestamp"}).setIncrementalLoad(true).build());
-                    logger.warning("Task completed with " + failedJobs + " errors. Failed rows stored in user_errors.csv table.");
+                    logger.warning("Task completed with " + failedJobs.getItems().size() + " errors. Failed rows stored in user_errors.csv table.");
                 }
 
                 if (jobIds.isEmpty()) {

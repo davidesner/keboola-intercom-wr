@@ -30,7 +30,13 @@ public class FailedUserBulkRequestItem extends FailedBulkRequestItem {
         this.parametersMap.put("email", u.getEmail());
         this.parametersMap.put("name", u.getName());
         this.parametersMap.put("type", u.getType());
-        this.parametersMap.put("job_run_timestamp", Instant.ofEpochSecond(data.getUpdatedAt()));
+
+        if (data.getUpdatedAt() > 0) {
+            this.parametersMap.put("job_run_timestamp", Instant.ofEpochSecond(data.getUpdatedAt()));
+        } else {
+            this.parametersMap.put("job_run_timestamp", Instant.now().getEpochSecond());
+        }
+
         if (u.getCustomAttributes() != null) {
             for (Entry<String, CustomAttribute> e : u.getCustomAttributes().entrySet()) {
                 if (e.getValue() != null) {
@@ -41,9 +47,13 @@ public class FailedUserBulkRequestItem extends FailedBulkRequestItem {
 
         this.errorMessages = new HashMap<>();
         int i = 0;
-        for (io.intercom.api.Error e : data.getError()) {
-            this.errorMessages.put("error" + i, e.getMessage());
-            i++;
+        if (data.getError() != null) {
+            for (io.intercom.api.Error e : data.getError()) {
+                this.errorMessages.put("error" + i, e.getMessage());
+                i++;
+            }
+        } else {
+            this.errorMessages.put("unknown error", "Unable to submit.");
         }
 
     }

@@ -99,6 +99,7 @@ public class Client {
                 waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
                 retries++;
             }
+
         }
         if (job == null) {
             throw new ClientException(1, "Unable to sumbit job, requests failed after " + RETRIES + " retries. " + lastException, null, "Unable to submit job!");
