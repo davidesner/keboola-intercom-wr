@@ -191,7 +191,7 @@ class HttpClient {
     }
 
     private boolean shouldSkipResponseEntity(JavaType javaType, HttpURLConnection conn, int responseCode) {
-        return responseCode == 202 || responseCode == 204 || Void.class.equals(javaType.getRawClass()) || "DELETE".equals(conn.getRequestMethod());
+        return responseCode == 204 || Void.class.equals(javaType.getRawClass()) || "DELETE".equals(conn.getRequestMethod());
     }
 
     private <T> T readEntity(HttpURLConnection conn, int responseCode, JavaType javaType) throws IOException {
@@ -250,10 +250,10 @@ class HttpClient {
     private Map<String, String> createAuthorizationHeaders() {
         switch (Intercom.getAuthKeyType()) {
             case API_KEY:
-                headers.put("Authorization", "Basic " + generateAuthString(Intercom.getAppID(),Intercom.getApiKey()));
+                headers.put("Authorization", "Basic " + generateAuthString(Intercom.getAppID(), Intercom.getApiKey()));
                 break;
             case TOKEN:
-                headers.put("Authorization", "Basic " + generateAuthString(Intercom.getToken(),""));
+                headers.put("Authorization", "Basic " + generateAuthString(Intercom.getToken(), ""));
                 break;
         }
         return headers;
