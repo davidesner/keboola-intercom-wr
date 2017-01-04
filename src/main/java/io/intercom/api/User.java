@@ -1,5 +1,6 @@
 package io.intercom.api;
 
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -30,14 +31,14 @@ public class User extends TypedData implements Replier {
     }
 
     public static User find(String id)
-            throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
+        throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
         final URI users = UriBuilder.newBuilder().path("users").path(id).build();
         final HttpClient resource = new HttpClient(users);
         return resource.get(User.class);
     }
 
     public static User find(Map<String, String> params)
-            throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
+        throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
         if ((!params.containsKey("email")) && (!params.containsKey("user_id"))) {
             throw new InvalidException("a user find must include an email or user_id parameter");
         }
@@ -45,7 +46,7 @@ public class User extends TypedData implements Replier {
     }
 
     public static User create(User user)
-            throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
+        throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
         return DataResource.create(UserUpdate.buildFrom(user), "users", User.class);
     }
 
@@ -55,32 +56,32 @@ public class User extends TypedData implements Replier {
     }
 
     public static User delete(String id)
-            throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
+        throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
         return DataResource.delete(id, "users", User.class);
     }
 
     public static UserCollection list(Map<String, String> params)
-            throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
+        throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
         return DataResource.list(params, "users", UserCollection.class);
     }
 
     public static UserCollection list()
-            throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
+        throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
         return DataResource.list(SENTINEL, "users", UserCollection.class);
     }
 
     public static Job submit(final List<JobItem<User>> items)
-            throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
+        throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
         return submit(items, null);
     }
 
     public static Job submit(final List<JobItem<User>> items, Job job)
-            throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
+        throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
         return Job.submit(UserUpdate.validateAndConvertJobItems(items), job, BULK_PATHS);
     }
 
     public static JobItemCollection<User> listJobErrorFeed(String jobID)
-            throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
+        throws AuthorizationException, ClientException, ServerException, InvalidException, RateLimitException {
         return Job.listJobErrorFeed(jobID, User.class);
     }
 
@@ -102,7 +103,7 @@ public class User extends TypedData implements Replier {
             userUpdate.customAttributes = user.getCustomAttributes();
             userUpdate.lastSeenUserAgent = user.getUserAgentData();
 
-            if (!buildUserUpdateCompanies(user).isEmpty()) {
+            if(! buildUserUpdateCompanies(user).isEmpty()) {
                 userUpdate.companyCollection = buildUserUpdateCompanies(user);
             }
 
@@ -119,9 +120,8 @@ public class User extends TypedData implements Replier {
             final JobSupport jobSupport = new JobSupport();
             for (JobItem<User> item : items) {
                 jobSupport.validateJobItem(item, BULK_METHODS);
-                updateItems.add(
-                        new JobItem<UserUpdate>(
-                                item.getMethod(), buildFrom(item.getData())));
+                final JobItem<UserUpdate> jobItem = new JobItem<UserUpdate>(item.getMethod(), buildFrom(item.getData()), item.getData().getType());
+                updateItems.add(jobItem);
             }
             return updateItems;
         }
@@ -312,8 +312,7 @@ public class User extends TypedData implements Replier {
     private LocationData locationData;
 
     @JsonIgnoreProperties(ignoreUnknown = false)
-    //@JsonProperty("companies")
-    @JsonIgnore
+    @JsonProperty("companies")
     private CompanyCollection companyCollection = new CompanyCollection();
 
     @JsonProperty("social_profiles")
@@ -544,91 +543,46 @@ public class User extends TypedData implements Replier {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         User user = (User) o;
 
-        if (createdAt != user.createdAt) {
+        if (createdAt != user.createdAt) return false;
+        if (lastRequestAt != user.lastRequestAt) return false;
+        if (signedUpAt != user.signedUpAt) return false;
+        if (newSession != user.newSession) return false;
+        if (remoteCreatedAt != user.remoteCreatedAt) return false;
+        if (sessionCount != user.sessionCount) return false;
+        if (unsubscribedFromEmails != user.unsubscribedFromEmails) return false;
+        if (updateLastRequestAt != user.updateLastRequestAt) return false;
+        if (updatedAt != user.updatedAt) return false;
+        if (avatar != null ? !avatar.equals(user.avatar) : user.avatar != null) return false;
+        if (companyCollection != null ? !companyCollection.equals(user.companyCollection) : user.companyCollection != null)
             return false;
-        }
-        if (lastRequestAt != user.lastRequestAt) {
+        if (customAttributes != null ? !customAttributes.equals(user.customAttributes) : user.customAttributes != null)
             return false;
-        }
-        if (signedUpAt != user.signedUpAt) {
+        if (email != null ? !email.equals(user.email) : user.email != null) return false;
+        if (id != null ? !id.equals(user.id) : user.id != null) return false;
+        if (lastSeenIp != null ? !lastSeenIp.equals(user.lastSeenIp) : user.lastSeenIp != null) return false;
+        if (locationData != null ? !locationData.equals(user.locationData) : user.locationData != null) return false;
+        if (name != null ? !name.equals(user.name) : user.name != null) return false;
+        if (segmentCollection != null ? !segmentCollection.equals(user.segmentCollection) : user.segmentCollection != null)
             return false;
-        }
-        if (newSession != user.newSession) {
+        if (socialProfileCollection != null ? !socialProfileCollection.equals(user.socialProfileCollection) : user.socialProfileCollection != null)
             return false;
-        }
-        if (remoteCreatedAt != user.remoteCreatedAt) {
+        if (tagCollection != null ? !tagCollection.equals(user.tagCollection) : user.tagCollection != null)
             return false;
-        }
-        if (sessionCount != user.sessionCount) {
+        if (!type.equals(user.type)) return false;
+        if (untag != null ? !untag.equals(user.untag) : user.untag != null) return false;
+        if (userAgentData != null ? !userAgentData.equals(user.userAgentData) : user.userAgentData != null)
             return false;
-        }
-        if (unsubscribedFromEmails != user.unsubscribedFromEmails) {
-            return false;
-        }
-        if (updateLastRequestAt != user.updateLastRequestAt) {
-            return false;
-        }
-        if (updatedAt != user.updatedAt) {
-            return false;
-        }
-        if (avatar != null ? !avatar.equals(user.avatar) : user.avatar != null) {
-            return false;
-        }
-        if (companyCollection != null ? !companyCollection.equals(user.companyCollection) : user.companyCollection != null) {
-            return false;
-        }
-        if (customAttributes != null ? !customAttributes.equals(user.customAttributes) : user.customAttributes != null) {
-            return false;
-        }
-        if (email != null ? !email.equals(user.email) : user.email != null) {
-            return false;
-        }
-        if (id != null ? !id.equals(user.id) : user.id != null) {
-            return false;
-        }
-        if (lastSeenIp != null ? !lastSeenIp.equals(user.lastSeenIp) : user.lastSeenIp != null) {
-            return false;
-        }
-        if (locationData != null ? !locationData.equals(user.locationData) : user.locationData != null) {
-            return false;
-        }
-        if (name != null ? !name.equals(user.name) : user.name != null) {
-            return false;
-        }
-        if (segmentCollection != null ? !segmentCollection.equals(user.segmentCollection) : user.segmentCollection != null) {
-            return false;
-        }
-        if (socialProfileCollection != null ? !socialProfileCollection.equals(user.socialProfileCollection) : user.socialProfileCollection != null) {
-            return false;
-        }
-        if (tagCollection != null ? !tagCollection.equals(user.tagCollection) : user.tagCollection != null) {
-            return false;
-        }
-        if (!type.equals(user.type)) {
-            return false;
-        }
-        if (untag != null ? !untag.equals(user.untag) : user.untag != null) {
-            return false;
-        }
-        if (userAgentData != null ? !userAgentData.equals(user.userAgentData) : user.userAgentData != null) {
-            return false;
-        }
         //noinspection RedundantIfStatement
-        if (userId != null ? !userId.equals(user.userId) : user.userId != null) {
-            return false;
-        }
+        if (userId != null ? !userId.equals(user.userId) : user.userId != null) return false;
 
         return true;
     }
+
 
     @Override
     public int hashCode() {
@@ -662,31 +616,31 @@ public class User extends TypedData implements Replier {
 
     @Override
     public String toString() {
-        return "User{"
-                + "type='" + type + '\''
-                + ", id='" + id + '\''
-                + ", name='" + name + '\''
-                + ", email='" + email + '\''
-                + ", userId='" + userId + '\''
-                + ", avatar=" + avatar
-                + ", createdAt=" + createdAt
-                + ", updatedAt=" + updatedAt
-                + ", remoteCreatedAt=" + remoteCreatedAt
-                + ", unsubscribedFromEmails=" + unsubscribedFromEmails
-                + ", sessionCount=" + sessionCount
-                + ", lastRequestAt=" + lastRequestAt
-                + ", signedUpAt=" + signedUpAt
-                + ", lastSeenIp='" + lastSeenIp + '\''
-                + ", customAttributes=" + customAttributes
-                + ", userAgentData='" + userAgentData + '\''
-                + ", locationData=" + locationData
-                + ", companyCollection=" + companyCollection
-                + ", socialProfileCollection=" + socialProfileCollection
-                + ", segmentCollection=" + segmentCollection
-                + ", tagCollection=" + tagCollection
-                + ", updateLastRequestAt=" + updateLastRequestAt
-                + ", newSession=" + newSession
-                + ", untag=" + untag
-                + "} " + super.toString();
+        return "User{" +
+                "type='" + type + '\'' +
+                ", id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", email='" + email + '\'' +
+                ", userId='" + userId + '\'' +
+                ", avatar=" + avatar +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", remoteCreatedAt=" + remoteCreatedAt +
+                ", unsubscribedFromEmails=" + unsubscribedFromEmails +
+                ", sessionCount=" + sessionCount +
+                ", lastRequestAt=" + lastRequestAt +
+                ", signedUpAt=" + signedUpAt +
+                ", lastSeenIp='" + lastSeenIp + '\'' +
+                ", customAttributes=" + customAttributes +
+                ", userAgentData='" + userAgentData + '\'' +
+                ", locationData=" + locationData +
+                ", companyCollection=" + companyCollection +
+                ", socialProfileCollection=" + socialProfileCollection +
+                ", segmentCollection=" + segmentCollection +
+                ", tagCollection=" + tagCollection +
+                ", updateLastRequestAt=" + updateLastRequestAt +
+                ", newSession=" + newSession +
+                ", untag=" + untag +
+                "} " + super.toString();
     }
 }

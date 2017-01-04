@@ -46,12 +46,9 @@ public class FailedUserBulkRequestItem extends FailedBulkRequestItem {
         }
 
         this.errorMessages = new HashMap<>();
-        int i = 0;
+
         if (data.getError() != null) {
-            for (io.intercom.api.Error e : data.getError()) {
-                this.errorMessages.put("error" + i, e.getMessage());
-                i++;
-            }
+            this.errorMessages.put("error", data.getError().getMessage());
         } else {
             this.errorMessages.put("unknown error", "Unable to submit.");
         }

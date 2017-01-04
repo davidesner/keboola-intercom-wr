@@ -1,6 +1,5 @@
 package io.intercom.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -10,12 +9,11 @@ import java.util.List;
 @SuppressWarnings("UnusedDeclaration")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class JobItemCollection<T extends TypedData>
-        extends TypedDataCollection<JobItem<T>>
-        implements Iterator<JobItem<T>> {
+    extends TypedDataCollection<JobItem<T>>
+    implements Iterator<JobItem<T>> {
 
     protected TypedDataCollectionIterator<JobItem<T>> iterator;
 
-    @JsonCreator
     public JobItemCollection() {
         iterator = new TypedDataCollectionIterator<JobItem<T>>(this);
     }

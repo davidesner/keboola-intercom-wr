@@ -47,7 +47,7 @@ public class Client {
 
     public Client(String appId, String apiKey) {
         Intercom.setAppID(appId);
-        Intercom.setApiKey(apiKey);
+        Intercom.setToken(apiKey);
 
         LoggerContext.getContext().getLogger("intercom-java").setLevel(Level.OFF);
     }
@@ -78,7 +78,7 @@ public class Client {
                     waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
                     retries++;
                 } catch (AuthorizationException ex) {
-                    throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Authorization error, check your credentials!");
+                    throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Authorization error, check your credentials! Do you use Personal Token instead of ApiKey?");
                 } catch (ServerException ex) {
                     waitNmilis(BACKOFF_INTERVAL);
                     retries++;
@@ -133,7 +133,7 @@ public class Client {
                 waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
                 retries++;
             } catch (AuthorizationException ex) {
-                throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Authorization error, check your credentials!");
+                throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "AAuthorization error, check your credentials! Do you use Personal Token instead of ApiKey?");
             } catch (ServerException ex) {
                 lastException = ex.getMessage();
                 waitNmilis(BACKOFF_INTERVAL);
@@ -207,7 +207,7 @@ public class Client {
                     waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
                     retries++;
                 } catch (AuthorizationException ex) {
-                    throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Authorization error, check your credentials!");
+                    throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Authorization error, check your credentials! Do you use Personal Token instead of ApiKey?");
                 } catch (ServerException ex) {
                     lastException = ex.getMessage();
                     waitNmilis(BACKOFF_INTERVAL);

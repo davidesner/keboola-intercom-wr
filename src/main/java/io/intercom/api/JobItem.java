@@ -1,11 +1,9 @@
 package io.intercom.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.util.List;
 
 @SuppressWarnings("UnusedDeclaration")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -28,7 +26,7 @@ public class JobItem<T extends TypedData> extends TypedData {
     private String dataType;
 
     @JsonProperty("error")
-    private List<Error> error;
+    private Error error;
 
     @JsonProperty("data")
     private T data;
@@ -37,15 +35,19 @@ public class JobItem<T extends TypedData> extends TypedData {
     }
 
     public JobItem(String method, T data) {
-        checkNotNull(method, data);
-        this.method = method;
-        this.data = data;
-        this.dataType = data.getType();
+        this(method, data, null);
     }
 
-    private void checkNotNull(String method, T data) {
+    JobItem(String method, T data, String dataType) {
         Conditions.checkNotNull(method, "item method must be supplied");
         Conditions.checkNotNull(data, "item data must be supplied");
+        this.method = method;
+        this.data = data;
+        this.dataType = dataType;
+        if (dataType == null) {
+            this.dataType = data.getType();
+        }
+        Conditions.checkNotNull(data, "item dataType must be supplied");
     }
 
     public String getType() {
@@ -69,7 +71,7 @@ public class JobItem<T extends TypedData> extends TypedData {
         return this;
     }
 
-    public List<Error> getError() {
+    public Error getError() {
         return error;
     }
 
@@ -88,56 +90,39 @@ public class JobItem<T extends TypedData> extends TypedData {
 
     @Override
     public String toString() {
-        return "JobItem{"
-                + "type='" + type + '\''
-                + ", id='" + id + '\''
-                + ", updatedAt=" + updatedAt
-                + ", method='" + method + '\''
-                + ", dataType='" + dataType + '\''
-                + ", error=" + error
-                + ", data=" + data
-                + "} " + super.toString();
+        return "JobItem{" +
+            "type='" + type + '\'' +
+            ", id='" + id + '\'' +
+            ", updatedAt=" + updatedAt +
+            ", method='" + method + '\'' +
+            ", dataType='" + dataType + '\'' +
+            ", error=" + error +
+            ", data=" + data +
+            "} " + super.toString();
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
         JobItem<?> jobItem = (JobItem<?>) o;
 
-        if (updatedAt != jobItem.updatedAt) {
-            return false;
-        }
+        if (updatedAt != jobItem.updatedAt) return false;
         //noinspection ConstantConditions
-        if (type != null ? !type.equals(jobItem.type) : jobItem.type != null) {
-            return false;
-        }
-        if (id != null ? !id.equals(jobItem.id) : jobItem.id != null) {
-            return false;
-        }
-        if (method != null ? !method.equals(jobItem.method) : jobItem.method != null) {
-            return false;
-        }
-        if (dataType != null ? !dataType.equals(jobItem.dataType) : jobItem.dataType != null) {
-            return false;
-        }
+        if (type != null ? !type.equals(jobItem.type) : jobItem.type != null) return false;
+        if (id != null ? !id.equals(jobItem.id) : jobItem.id != null) return false;
+        if (method != null ? !method.equals(jobItem.method) : jobItem.method != null) return false;
+        if (dataType != null ? !dataType.equals(jobItem.dataType) : jobItem.dataType != null) return false;
         //noinspection SimplifiableIfStatement
-        if (error != null ? !error.equals(jobItem.error) : jobItem.error != null) {
-            return false;
-        }
+        if (error != null ? !error.equals(jobItem.error) : jobItem.error != null) return false;
         return !(data != null ? !data.equals(jobItem.data) : jobItem.data != null);
 
     }
 
     @Override
     public int hashCode() {
-        @SuppressWarnings("ConstantConditions")
-        int result = type != null ? type.hashCode() : 0;
+        @SuppressWarnings("ConstantConditions") int result = type != null ? type.hashCode() : 0;
         result = 31 * result + (id != null ? id.hashCode() : 0);
         result = 31 * result + (int) (updatedAt ^ (updatedAt >>> 32));
         result = 31 * result + (method != null ? method.hashCode() : 0);
