@@ -2,28 +2,12 @@
  */
 package esnerda.keboola.intercom.writer;
 
-import esnerda.keboola.components.logging.DefaultLogger;
-import esnerda.keboola.components.KBCException;
-import esnerda.keboola.components.logging.KBCLogger;
-import esnerda.keboola.components.configuration.handler.ConfigHandlerBuilder;
-import esnerda.keboola.components.configuration.handler.KBCConfigurationEnvHandler;
-import esnerda.keboola.components.configuration.tableconfig.ManifestFile;
-import esnerda.keboola.intercom.writer.client.Client;
-import esnerda.keboola.intercom.writer.client.ClientException;
-import esnerda.keboola.intercom.writer.client.FailedItemsCollection;
-import esnerda.keboola.intercom.writer.client.IntercomValidationException;
-import esnerda.keboola.intercom.writer.client.request.UserBulkJobRequest;
-import esnerda.keboola.intercom.writer.client.request.UserObjectBuilder;
-import esnerda.keboola.intercom.writer.config.IntercomWrParameters;
-import esnerda.keboola.intercom.writer.config.IntercomWrLastState;
-import esnerda.keboola.intercom.writer.config.UserMapping;
-
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -34,6 +18,22 @@ import org.supercsv.exception.SuperCsvException;
 import org.supercsv.io.CsvMapReader;
 import org.supercsv.io.ICsvMapReader;
 import org.supercsv.prefs.CsvPreference;
+
+import esnerda.keboola.components.KBCException;
+import esnerda.keboola.components.configuration.handler.ConfigHandlerBuilder;
+import esnerda.keboola.components.configuration.handler.KBCConfigurationEnvHandler;
+import esnerda.keboola.components.configuration.tableconfig.ManifestFile;
+import esnerda.keboola.components.logging.DefaultLogger;
+import esnerda.keboola.components.logging.KBCLogger;
+import esnerda.keboola.intercom.writer.client.Client;
+import esnerda.keboola.intercom.writer.client.ClientException;
+import esnerda.keboola.intercom.writer.client.FailedItemsCollection;
+import esnerda.keboola.intercom.writer.client.IntercomValidationException;
+import esnerda.keboola.intercom.writer.client.request.UserBulkJobRequest;
+import esnerda.keboola.intercom.writer.client.request.UserObjectBuilder;
+import esnerda.keboola.intercom.writer.config.IntercomWrLastState;
+import esnerda.keboola.intercom.writer.config.IntercomWrParameters;
+import esnerda.keboola.intercom.writer.config.UserMapping;
 
 /**
  *
@@ -234,7 +234,8 @@ public class Writer {
         } finally {
             /*Set state file if some unfinished jobs*/
             if (!jobIds.isEmpty()) {
-                IntercomWrLastState state = new IntercomWrLastState(jobIds);
+            	//TODO hack before state file leak is identified.
+                IntercomWrLastState state = new IntercomWrLastState(Collections.EMPTY_LIST); //new IntercomWrLastState(jobIds); 
                 try {
                     handler.writeStateFile(state);
                 } catch (KBCException ex) {
