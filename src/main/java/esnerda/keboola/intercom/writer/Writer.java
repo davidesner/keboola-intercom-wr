@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -234,8 +233,8 @@ public class Writer {
         } finally {
             /*Set state file if some unfinished jobs*/
             if (!jobIds.isEmpty()) {
-            	//TODO hack before state file leak is identified.
-                IntercomWrLastState state = new IntercomWrLastState(Collections.EMPTY_LIST); //new IntercomWrLastState(jobIds); 
+            	//TODO FIXME.
+                IntercomWrLastState state = new IntercomWrLastState(jobIds); //new IntercomWrLastState(jobIds); 
                 try {
                     handler.writeStateFile(state);
                 } catch (KBCException ex) {
