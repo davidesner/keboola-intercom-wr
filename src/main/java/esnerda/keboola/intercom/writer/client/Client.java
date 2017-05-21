@@ -2,6 +2,18 @@
  */
 package esnerda.keboola.intercom.writer.client;
 
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.LoggerContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import esnerda.keboola.intercom.writer.SimpleTimer;
 import esnerda.keboola.intercom.writer.client.request.CustomColumnMapping;
 import esnerda.keboola.intercom.writer.client.request.FailedBulkRequestItem;
 import esnerda.keboola.intercom.writer.client.request.FailedUserBulkRequestItem;
@@ -20,19 +32,6 @@ import io.intercom.api.RateLimitException;
 import io.intercom.api.ServerException;
 import io.intercom.api.User;
 import io.intercom.api.UserCollection;
-
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.LoggerContext;
-
-import org.slf4j.Logger;
-
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -170,20 +169,21 @@ public class Client {
     }
 
     public List<FailedBulkRequestItem> waitAndCollectResults(List<String> jobIds, long runTimeSeconds, long waitIntervalMilis) throws ClientException {
-        List<FailedBulkRequestItem> failedJobs = new ArrayList<>();
-        Iterator<String> jobIter;
-        long tStart = System.currentTimeMillis() / 1000;
-        while (!jobIds.isEmpty() && (System.currentTimeMillis() / 1000 - tStart) < runTimeSeconds) {
-
-            jobIter = jobIds.iterator();
-            String jobId;
-            while (jobIter.hasNext() && (System.currentTimeMillis() / 1000 - tStart) < runTimeSeconds) {
-                jobId = jobIter.next();
+        List<FailedBulkRequestItem> failedJobs = new ArrayList<>();       
+        SimpleTimer tmr = new SimpleTimer(runTimeSeconds * 1000);
+        tmr.startTimer();
+        boolean flag = false;
+        while (!flag && !tmr.isTimedOut()) {
+        	flag = true;
+        	List<String> unfinishedJobs = new ArrayList<>(jobIds);
+           for(String jobId : unfinishedJobs) {      
                 //wait between each check
-                waitNmilis(waitIntervalMilis);
+                SimpleTimer.reallySleep(waitIntervalMilis);
                 if (isJobCompleted(jobId)) {
-                    failedJobs.addAll(getFailedUserJobItems(jobId));
-                    jobIter.remove();
+                	jobIds.remove(jobId);
+                    failedJobs.addAll(getFailedUserJobItems(jobId));                   
+                } else {
+                	flag = false;
                 }
             }
 
@@ -248,30 +248,27 @@ public class Client {
         if (job.getState().equals("completed") || job.getState().equals("completed_with_errors")) {
             //job is finished
             return true;
-        } else {
-            //job still open but all tasks had finished
-            List<JobTask> tasks = job.getTasks();
-            if (tasks != null) {
-
-                return tasks.stream().allMatch((JobTask task) -> {
-                    return (task.getCompletedAt() != null) && (Instant.now().getEpochSecond() >= task.getCompletedAt());
-                }
-                );
-            } else {
-                return false;
-            }
         }
+		//job still open but all tasks had finished
+		List<JobTask> tasks = job.getTasks();
+		if (tasks != null) {
+
+		    return tasks.stream().allMatch((JobTask task) -> {
+		        return (task.getCompletedAt() != null) && (Instant.now().getEpochSecond() >= task.getCompletedAt());
+		    }
+		    );
+		}
+		return false;
     }
 
-    private void waitNmilis(long interval) {
-        try {
-            //wait until rate limit renewed
-            Thread.sleep(interval);
-        } catch (InterruptedException | RuntimeException ex) {
-            LoggerFactory.getLogger(this.getClass()).warn("Thread sleep failed " + ex.getMessage());
+	private void waitNmilis(long interval) {
+		if (interval < 0) {
+			return;
+		}
+		// wait until rate limit renewed
+		SimpleTimer.reallySleep(interval);
 
-        }
-    }
+	}
 
     /**
      * Sets the interval between each request. Saves Api's resources.

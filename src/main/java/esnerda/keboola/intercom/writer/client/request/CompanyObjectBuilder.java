@@ -2,10 +2,11 @@
  */
 package esnerda.keboola.intercom.writer.client.request;
 
-import io.intercom.api.Company;
-import io.intercom.api.CustomAttribute;
 import java.util.List;
 import java.util.Map;
+
+import io.intercom.api.Company;
+import io.intercom.api.CustomAttribute;
 
 /**
  *
@@ -134,7 +135,7 @@ public class CompanyObjectBuilder {
     
     public Company build(){
         //return null on empty company
-        if(this.company.getId()==null) return null;
+        if(this.company.getCompanyID()==null) return null;
         return this.company;
     }
 

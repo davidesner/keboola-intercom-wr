@@ -202,7 +202,6 @@ public class Writer {
                     }
                 }
             }
-//            jobIds.add("job_30738a3a_5424_11e6_9850_795173bba9ec");
             logger.info((jobIds.size() - unproccessedJobsCount) + " bulk jobs successfuly submited.");
 
             /*Retrieve results*/
