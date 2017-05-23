@@ -42,7 +42,7 @@ import esnerda.keboola.intercom.writer.config.UserMapping;
 public class Writer {
 
     //max run time before give up result collection (Seconds)
-    private final static long MAX_RUN_TIME = 3600;
+    private final static long MAX_RUN_TIME = 21500;
     //milis between jobStatus refresh request
     private final static long REQ_WAIT_INTERVAL = 1000;
 
