@@ -1,10 +1,10 @@
 package io.intercom.api;
 
 
-import com.google.common.collect.Lists;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.google.common.collect.Lists;
 
 class CompanyUpdateBuilder {
 
@@ -32,15 +32,19 @@ class CompanyUpdateBuilder {
     }
 
     private static CompanyWithStringPlan prepareUpdatableCompany(Company company) {
-        final CompanyWithStringPlan updatableCompany = new CompanyWithStringPlan();
-        updatableCompany.setCompanyID(company.getCompanyID());
-        updatableCompany.setName(company.getName());
-        updatableCompany.setSessionCount(company.getSessionCount());
-        updatableCompany.setMonthlySpend(company.getMonthlySpend());
-        updatableCompany.setRemoteCreatedAt(company.getRemoteCreatedAt());
-        if (company.getPlan() != null) {
-            updatableCompany.setPlan(company.getPlan().getName());
-        }
-        return updatableCompany;
-    }
+    	 final CompanyWithStringPlan updatableCompany = new CompanyWithStringPlan();
+         updatableCompany.setId(company.getId());
+         updatableCompany.setCompanyID(company.getCompanyID());
+         updatableCompany.setName(company.getName());
+         updatableCompany.setSessionCount(company.getSessionCount());
+         updatableCompany.setMonthlySpend(company.getMonthlySpend());
+         updatableCompany.setRemoteCreatedAt(company.getRemoteCreatedAt());
+         if (company.getCustomAttributes() != null) {
+             updatableCompany.getCustomAttributes().putAll(company.getCustomAttributes());
+         }
+         if (company.getPlan() != null) {
+             updatableCompany.setPlan(company.getPlan().getName());
+         }
+         return updatableCompany;
+     }
 }

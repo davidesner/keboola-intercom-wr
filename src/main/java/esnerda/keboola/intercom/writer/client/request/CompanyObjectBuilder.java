@@ -123,7 +123,7 @@ public class CompanyObjectBuilder {
 //TODO: throw exception
                       }
                   }else{
-                   //TODO: throw exception on missing column name in data   
+                   return this; 
                   }
                       this.company.addCustomAttribute(cust);
             
