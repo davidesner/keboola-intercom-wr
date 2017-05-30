@@ -10,8 +10,6 @@ import java.util.Map;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LoggerContext;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import esnerda.keboola.intercom.writer.SimpleTimer;
 import esnerda.keboola.intercom.writer.client.request.CustomColumnMapping;
@@ -20,7 +18,6 @@ import esnerda.keboola.intercom.writer.client.request.FailedUserBulkRequestItem;
 import esnerda.keboola.intercom.writer.client.request.UserBulkJobRequest;
 import io.intercom.api.AuthorizationException;
 import io.intercom.api.CustomAttribute;
-import io.intercom.api.ErrorCollection;
 import io.intercom.api.Intercom;
 import io.intercom.api.IntercomException;
 import io.intercom.api.InvalidException;
@@ -157,15 +154,13 @@ public class Client {
         while (jc.hasNextPage()) {
             failedUItems.addAll(jc.nextPage().getPage());
         }
-        if (!failedUItems.isEmpty()) {
-            failedUItems.stream().forEach((i) -> {
-                failedItems.add(new FailedUserBulkRequestItem(i));
-
-            });
-        }
+		if (!failedUItems.isEmpty()) {
+			for (JobItem<User> jb : failedUItems) {
+				failedItems.add(new FailedUserBulkRequestItem(jb));
+			}
+		}
 
         return failedItems;
-        //TODO: proccess and return job errors;
     }
 
     public List<FailedBulkRequestItem> waitAndCollectResults(List<String> jobIds, long runTimeSeconds, long waitIntervalMilis) throws ClientException {
@@ -311,59 +306,5 @@ public class Client {
             throw new InvalidAttributeNamesException("Invalid custom attributes names!", "Some User custom attributes names are invalid! Please check your configuration and use existing names or set mapping parameter to 'create' accordingly.", invColumns);
         }
 
-    }
-
-    public void testRun() {
-        Logger logger = (Logger) LoggerFactory.getLogger("intercom-java");
-        //logger.setLevel(Level.ALL);
-        // Bulk submit users
-//        User user1 = new User().setUserId("40006604").setLastRequestAt(1469014081);
-//        User user2 = new User().setUserId("40006727").setLastRequestAt(1469014081);
-//
-//        final List<JobItem<User>> items = new ArrayList<>();
-//        items.add(new JobItem<>("post", user1));
-//
-//        Job job = User.submit(items);
-//        System.out.println(job.getID());
-//
-//        final List<JobItem<User>> moreItems = new ArrayList<>();
-//        moreItems.add(new JobItem<User>("post", user2));
-//
-//        User.submit(moreItems, job);
-////View a bulk job error feed
-//        System.out.println(job.getState());
-//        JobItemCollection jc = User.listJobErrorFeed(job.getID());
-//
-//        List<JobTask> tasks = job.getTasks();
-//        System.out.println("Job started at " + Instant.ofEpochSecond(job.getCreatedAt()).toString());
-        Job job = Job.find("job_a3028686_532b_11e6_9c5b_0d7a9e284a5f");
-        while (!job.getState().equals("completed")) {
-            job = Job.find("job_a3028686_532b_11e6_9c5b_0d7a9e284a5f");
-//            try {
-//                //Thread.sleep(10000);
-//            } catch (InterruptedException ex) {
-//                Logger.getLogger(Client.class.getName()).log(Level.SEVERE, null, ex);
-//            }
-
-//            if (tasks != null) {
-//                for (JobTask task : tasks) {
-//                    System.out.println(task.getCompletedAt());
-//                }
-//            }
-        }
-        //jc.getType();
-    }
-
-    public void testRunSingle() {
-        // Bulk submit users
-        User user1 = new User().setUserId("asd").setLastRequestAt(1469014081);
-        user1.addCustomAttribute(CustomAttribute.newIntegerAttribute("super_additional_attr", 10));
-        user1.addCustomAttribute(CustomAttribute.newStringAttribute("typ", "type"));
-
-        try {
-            User.update(user1);
-        } catch (InvalidException | AuthorizationException ec) {
-            ErrorCollection ecr = ec.getErrorCollection();
-        }
     }
 }

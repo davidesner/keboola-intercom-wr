@@ -2,13 +2,14 @@
  */
 package esnerda.keboola.intercom.writer.client.request;
 
+import java.util.List;
+import java.util.Map;
+
 import esnerda.keboola.intercom.writer.client.IntercomValidationException;
 import esnerda.keboola.intercom.writer.client.request.CompanyObjectBuilder.CompanyStaticColumns;
 import io.intercom.api.Company;
 import io.intercom.api.CustomAttribute;
 import io.intercom.api.User;
-import java.util.List;
-import java.util.Map;
 
 /**
  *

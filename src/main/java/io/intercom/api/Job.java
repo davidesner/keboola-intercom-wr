@@ -1,16 +1,16 @@
 package io.intercom.api;
 
+import java.net.URI;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.google.common.collect.Maps;
-
-import java.net.URI;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 @SuppressWarnings("UnusedDeclaration")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -60,13 +60,17 @@ public class Job extends TypedData {
         final TypeReference<JobItemCollection<T>> typeReference =
             new TypeReference<JobItemCollection<T>>() {
             };
-
-        final JavaType type = MapperSupport
-            .objectMapper()
-            .getTypeFactory()
-            .constructParametricType(JobItemCollection.class, c);
-        return resource.get(type);
-    }
+            /* BugFix of original lib. */
+            final JavaType type1 = MapperSupport
+                    .objectMapper()
+                    .getTypeFactory()
+                    .constructParametricType(JobItem.class, c);
+            final JavaType type = MapperSupport
+                    .objectMapper()
+                    .getTypeFactory()
+                    .constructParametricType(JobItemCollection.class, type1);
+            return resource.get(type);
+        }
 
 
     @JsonProperty("type")

@@ -2,13 +2,14 @@
  */
 package esnerda.keboola.intercom.writer.client.request;
 
-import io.intercom.api.CustomAttribute;
-import io.intercom.api.JobItem;
-import io.intercom.api.User;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import io.intercom.api.CustomAttribute;
+import io.intercom.api.JobItem;
+import io.intercom.api.User;
 
 /**
  *
