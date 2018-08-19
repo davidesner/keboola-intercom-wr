@@ -149,7 +149,7 @@ public class Writer {
                                     .build());
                         } catch (ClientException ex) {
                             if (ex.getSeverity() < 2) {
-                                logger.log(ex.getSeverity(), ex.getDetailedMessage());
+                                logger.log(ex.getSeverity(), ex.getMessage() + ex.getDetailedMessage());
                                 try {
                                     //collect failed jobs
                                     failedJobs.addAllBulkJob(userReq);
@@ -157,20 +157,24 @@ public class Writer {
                                     logger.log(ex.getSeverity(), "Unable to store failed row. " + ex1.getMessage());
                                 }
                             } else {
-                                System.err.print(ex.getDetailedMessage());
+                                System.err.print(ex.getMessage() + ex.getDetailedMessage());
                                 System.exit(ex.getSeverity() - 1);
                             }
                         }
                     }
                 } catch (UserBulkJobRequest.TaskLimitExceeded ex) {
-                    logger.warning("Too many user tasks in request, should not happen!");
+                    logger.error("Too many user tasks in request, should not happen!");
+                    System.exit(1);
                 } catch (IntercomValidationException ex) {
-                    logger.warning(ex.getDetailedMessage());
+                    logger.error(ex.getDetailedMessage());
+                    System.exit(1);
+                    //always quit on validation error 
+                    /*
                     try {
                         failedJobs.addAllBulkJob(userReq);
                     } catch (FailedItemsCollection.IllegalValueException ex1) {
                         logger.warning("Unable to store failed row. ");
-                    }
+                    }*/
 
                 }
             }//END send data
@@ -209,9 +213,10 @@ public class Writer {
                         client.waitAndCollectResults(jobIds, MAX_RUN_TIME - getRuntime(), REQ_WAIT_INTERVAL)
                 );
             } catch (ClientException ex) {
-                logger.warning(ex.getDetailedMessage());
+                logger.error(ex.getDetailedMessage());
             } catch (FailedItemsCollection.IllegalValueException ex) {
                 logger.error(ex.getMessage());
+                System.exit(1);
             }
 
         } catch (KBCException ex) {
