@@ -10,8 +10,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.supercsv.exception.SuperCsvException;
 import org.supercsv.io.CsvMapReader;
@@ -42,7 +40,7 @@ import esnerda.keboola.intercom.writer.config.UserMapping;
 public class Writer {
 
     //max run time before give up result collection (Seconds)
-    private final static long MAX_RUN_TIME = 21500;
+    private final static long MAX_RUN_TIME = 19800;
     //milis between jobStatus refresh request
     private final static long REQ_WAIT_INTERVAL = 1000;
 
@@ -262,7 +260,7 @@ public class Writer {
                     csvreader.close();
                 }
             } catch (IOException ex) {
-                Logger.getLogger(Writer.class.getName()).log(Level.SEVERE, null, ex);
+            	logger.error(ex.getMessage());
             } catch (KBCException ex) {
                 logger.error(ex.getDetailedMessage());
             } catch (RuntimeException ex) {

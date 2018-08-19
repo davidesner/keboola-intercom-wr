@@ -24,6 +24,9 @@
                     </execution>
                 </executions>
                 <configuration>
+                	<arguments>
+						<argument>-Djava.util.logging.config.file="logging.properties"</argument>
+					</arguments>
                     <mainClass>esnerda.keboola.intercom.writer.Writer</mainClass>                  
                 </configuration>
             </plugin>
@@ -48,11 +51,11 @@
             <artifactId>keboola-components-lib</artifactId>
             <version>v1.0.2</version>
         </dependency> -->
-        <!--        <dependency>
-            <groupId>io.intercom</groupId>
+        <dependency>
+            <groupId>com.github.davidesner</groupId>
             <artifactId>intercom-java</artifactId>
-            <version>2.0.0</version>
-        </dependency>-->
+            <version>2.5.0-mod</version>
+        </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
