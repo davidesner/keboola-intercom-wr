@@ -9,7 +9,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
-    </properties>
+        <jackson.version>2.7.4</jackson.version>
+	</properties>
     <build>
         <plugins>
             <plugin>
@@ -46,11 +47,11 @@
     </repositories>
     
     <dependencies>
-        <!--        <dependency>
+        <dependency>
             <groupId>com.github.davidesner</groupId>
             <artifactId>keboola-components-lib</artifactId>
-            <version>v1.0.2</version>
-        </dependency> -->
+            <version>v1.0.8</version>
+        </dependency>
         <dependency>
             <groupId>com.github.davidesner</groupId>
             <artifactId>intercom-java</artifactId>
@@ -59,21 +60,16 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-annotations</artifactId>
-            <version>2.4.2</version>
+            <version>${jackson.version}</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.4.2</version>
+            <version>${jackson.version}</version>
             <type>jar</type>
         </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.dataformat</groupId>
-            <artifactId>jackson-dataformat-yaml</artifactId>
-            <version>2.5.4</version>
-            <type>jar</type>
-        </dependency>
+
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -106,34 +102,5 @@
         </dependency>
 
         
-        <!--        Intercom library dependencies-->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-core</artifactId>
-            <version>2.4.2</version>
-        </dependency>
-
-
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>17.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.7</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-codec</groupId>
-            <artifactId>commons-codec</artifactId>
-            <version>1.9</version>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <version>4.11</version>
-        </dependency>
-
     </dependencies>
 </project>

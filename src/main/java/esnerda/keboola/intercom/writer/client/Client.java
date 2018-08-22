@@ -4,20 +4,17 @@ package esnerda.keboola.intercom.writer.client;
 
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.function.Function;
 
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.LoggerContext;
 
 import esnerda.keboola.intercom.writer.SimpleTimer;
-import esnerda.keboola.intercom.writer.client.request.CustomColumnMapping;
 import esnerda.keboola.intercom.writer.client.request.FailedBulkRequestItem;
 import esnerda.keboola.intercom.writer.client.request.FailedUserBulkRequestItem;
 import esnerda.keboola.intercom.writer.client.request.UserBulkJobRequest;
 import io.intercom.api.AuthorizationException;
-import io.intercom.api.CustomAttribute;
 import io.intercom.api.Intercom;
 import io.intercom.api.IntercomException;
 import io.intercom.api.InvalidException;
@@ -28,7 +25,6 @@ import io.intercom.api.JobTask;
 import io.intercom.api.RateLimitException;
 import io.intercom.api.ServerException;
 import io.intercom.api.User;
-import io.intercom.api.UserCollection;
 
 /**
  *
@@ -39,7 +35,7 @@ public class Client {
 
     private final static long BACKOFF_INTERVAL = 500;
     private final static int RETRIES = 5;
-    private static long WAIT_INTERVAL = 0;
+    private static long WAIT_INTERVAL = 120;
 
     public Client(String appId, String apiKey) {
         Intercom.setAppID(appId);
@@ -48,6 +44,80 @@ public class Client {
         LoggerContext.getContext().getLogger("intercom-java").setLevel(Level.OFF);
     }
 
+    
+    
+    /**
+     * Sets the interval between each request. Saves Api's resources.
+     *
+     * @param interval - wait time in miliseconds
+     */
+    public void setWaitInterval(long interval) {
+        WAIT_INTERVAL = interval;
+    }
+
+    /**
+     * Update or Create User record. Handles ratelimiting.
+     * @param user
+     * @return
+     * @throws ClientException
+     */
+    public User upsertUser(User user) throws ClientException {
+    	return performRequest(user, User::create);
+    }
+ 
+    
+    /**
+     * Generic function wrapper executing Intercom request using one of the Intercom classes. It handles failover policy and rate-limiting.
+     * 
+     * @param object - Intercom object like User, Company
+     * @param f - Function to be executed, e.g. User::update. Returning the affected object.
+     * @return the affected object, e.g. updated User
+     * @throws ClientException
+     */
+    private <T>  T performRequest(T object, Function<T,T> f) throws ClientException {
+        boolean success = false;
+        int retries = 0;
+        /*Submit items, try to recover on some*/
+        waitNmilis(WAIT_INTERVAL);//optional wait interval
+        T result = null;
+        while (!success && retries <= RETRIES) {
+            if (Intercom.getRateLimitDetails().canSubmit()) {
+                try {
+
+                    result = f.apply(object);
+                    success = true;
+
+                } catch (RateLimitException rex) {
+                    waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
+                    retries++;
+                } catch (AuthorizationException ex) {
+                    throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Authorization error, check your credentials! Do you use Personal Token instead of ApiKey?");
+                } catch (ServerException ex) {
+                    waitNmilis(BACKOFF_INTERVAL);
+                    retries++;
+                } catch (io.intercom.api.ClientException | InvalidException ex) {
+                    throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Unable to perform request!");
+                } catch (IntercomException ex) {
+                    if (retries >= RETRIES - 1) {
+                        throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Unable to perform request after several tries!");
+                    }
+
+                    waitNmilis(BACKOFF_INTERVAL);
+                    retries++;
+                }
+
+            } else {
+                //wait until rate limit renewed
+                waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
+                retries++;
+            }
+
+        }
+    	return result;
+    }
+
+    /******** Deprecated bulk processing methods (Bulk APIs were deprecated by Intercom)  ******/
+
     /**
      * Submits bulk user request. Return resulting job ID if successfull
      *
@@ -55,6 +125,7 @@ public class Client {
      * @return
      * @throws ClientException
      */
+    @Deprecated
     public String submitUserBulkJobRequest(UserBulkJobRequest req) throws ClientException {
         String lastException = "";
         Job job = null;
@@ -104,6 +175,7 @@ public class Client {
 
     }
 
+    @Deprecated
     public List<FailedBulkRequestItem> getFailedUserJobItems(String jobId) throws ClientException {
         String lastException = "";
         List<FailedBulkRequestItem> failedItems = new ArrayList<>();
@@ -163,6 +235,7 @@ public class Client {
         return failedItems;
     }
 
+    @Deprecated
     public List<FailedBulkRequestItem> waitAndCollectResults(List<String> jobIds, long runTimeSeconds, long waitIntervalMilis) throws ClientException {
         List<FailedBulkRequestItem> failedJobs = new ArrayList<>();       
         SimpleTimer tmr = new SimpleTimer(runTimeSeconds * 1000);
@@ -186,6 +259,7 @@ public class Client {
         return failedJobs;
     }
 
+    @Deprecated
     private Job getJobById(String id) throws ClientException {
         boolean success = false;
         int retries = 0;
@@ -238,6 +312,7 @@ public class Client {
      * @return
      * @throws ClientException
      */
+    @Deprecated
     public boolean isJobCompleted(String jobId) throws ClientException {
         Job job = getJobById(jobId);
         if (job.getState().equals("completed") || job.getState().equals("completed_with_errors")) {
@@ -265,46 +340,5 @@ public class Client {
 
 	}
 
-    /**
-     * Sets the interval between each request. Saves Api's resources.
-     *
-     * @param interval - wait time in miliseconds
-     */
-    public void setWaitInterval(long interval) {
-        WAIT_INTERVAL = interval;
-    }
-
-    public void validateUserCustomAttributes(List<CustomColumnMapping> userColNames, List<CustomColumnMapping> companyCustColNames) throws InvalidAttributeNamesException {
-        Map<String, String> params = new HashMap<>();
-        params.put("per_page", "1");
-
-        UserCollection users = User.list(params);
-        User testU = users.next();
-
-        Map<String, CustomAttribute> attrMap = testU.getCustomAttributes();
-        List<String> invColumns = new ArrayList();
-        List<String> invCompanyColumns = new ArrayList();
-        for (CustomColumnMapping srcCol : userColNames) {
-
-            if (!attrMap.containsKey(srcCol.getDestCol()) && !srcCol.isIsNew()) {
-                invColumns.add(srcCol.getSrcCol());
-            }
-        }
-
-        if (testU.getCompanyCollection() != null && testU.getCompanyCollection().hasNext()) {
-            attrMap = testU.getCompanyCollection().next().getCustomAttributes();
-        }
-
-        for (CustomColumnMapping srcCol : companyCustColNames) {
-
-            if (!attrMap.containsKey(srcCol.getDestCol()) && !srcCol.isIsNew()) {
-                invColumns.add(srcCol.getSrcCol());
-            }
-        }
-
-        if (!invColumns.isEmpty()) {
-            throw new InvalidAttributeNamesException("Invalid custom attributes names!", "Some User custom attributes names are invalid! Please check your configuration and use existing names or set mapping parameter to 'create' accordingly.", invColumns);
-        }
-
-    }
+   
 }
