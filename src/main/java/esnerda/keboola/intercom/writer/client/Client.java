@@ -36,7 +36,7 @@ public class Client {
 
     private final static long BACKOFF_INTERVAL = 500;
     private final static int RETRIES = 5;
-    private static long WAIT_INTERVAL = 120;
+    private static long WAIT_INTERVAL = 0;
 
     public Client(String appId, String apiKey) {
         Intercom.setAppID(appId);
@@ -341,7 +341,7 @@ public class Client {
     }
 
 	private void waitNmilis(long interval) {
-		if (interval < 0) {
+		if (interval <= 0) {
 			return;
 		}
 		// wait until rate limit renewed
