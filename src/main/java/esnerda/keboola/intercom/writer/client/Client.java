@@ -15,6 +15,7 @@ import esnerda.keboola.intercom.writer.client.request.FailedBulkRequestItem;
 import esnerda.keboola.intercom.writer.client.request.FailedUserBulkRequestItem;
 import esnerda.keboola.intercom.writer.client.request.UserBulkJobRequest;
 import io.intercom.api.AuthorizationException;
+import io.intercom.api.ErrorCollection;
 import io.intercom.api.Intercom;
 import io.intercom.api.IntercomException;
 import io.intercom.api.InvalidException;
@@ -91,15 +92,15 @@ public class Client {
                     waitNmilis(Intercom.getRateLimitDetails().getRemainingMilis() + 1);
                     retries++;
                 } catch (AuthorizationException ex) {
-                    throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Authorization error, check your credentials! Do you use Personal Token instead of ApiKey?");
+                    throw new ClientException(2, ex.getMessage(), ex.getMessage() + serializeErrorCollection(ex.getErrorCollection()), "Authorization error, check your credentials! Do you use Personal Token instead of ApiKey?", ex);
                 } catch (ServerException ex) {
                     waitNmilis(BACKOFF_INTERVAL);
                     retries++;
                 } catch (io.intercom.api.ClientException | InvalidException ex) {
-                    throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Unable to perform request!");
+                    throw new ClientException(2, ex.getMessage() + serializeErrorCollection(ex.getErrorCollection()), ex.getErrorCollection(), "Unable to perform request!", ex);
                 } catch (IntercomException ex) {
                     if (retries >= RETRIES - 1) {
-                        throw new ClientException(2, ex.getMessage(), ex.getErrorCollection(), "Unable to perform request after several tries!");
+                        throw new ClientException(2, ex.getMessage() + serializeErrorCollection(ex.getErrorCollection()), ex.getErrorCollection(), "Unable to perform request after several tries!", ex);
                     }
 
                     waitNmilis(BACKOFF_INTERVAL);
@@ -114,6 +115,14 @@ public class Client {
 
         }
     	return result;
+    }
+
+    private String serializeErrorCollection(ErrorCollection errcol) {
+    	StringBuilder sb = new StringBuilder();
+    	sb.append("Errors: {");
+    	errcol.getErrors().forEach(err -> sb.append(err.getCode() + " : " + err.getMessage() + ";"));
+    	sb.append("}");
+    	return sb.toString();
     }
 
     /******** Deprecated bulk processing methods (Bulk APIs were deprecated by Intercom)  ******/

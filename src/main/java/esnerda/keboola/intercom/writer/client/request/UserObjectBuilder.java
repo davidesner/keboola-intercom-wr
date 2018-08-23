@@ -118,69 +118,84 @@ public class UserObjectBuilder {
                
     }
     
-    public UserObjectBuilder setUserCustomColumns(Map<String, String> userColValues, List<CustomColumnMapping> columnMapping) throws IntercomValidationException{
-     
-         String value;
-         if( columnMapping != null && !columnMapping.isEmpty()){
-             for(CustomColumnMapping mapping : columnMapping){
-                 CustomAttribute cust = null;
-                  if (userColValues.containsKey(mapping.getSrcCol())) {
-                      value = userColValues.get(mapping.getSrcCol());
-                      String key = mapping.getDestCol();
-                      
-                      if(key==null ||key.isEmpty() || key.equals("")){// set key if value is not specified
-                          key=mapping.getSrcCol();
-                      }
-                      /*create attribute*/
-                    
-                      
-                       switch(mapping.getDataType()){
-                          case String:
-                               cust = CustomAttribute.newStringAttribute(key, value);
-                               break;
-                               
-                          case Integer:
-                             cust = CustomAttribute.newIntegerAttribute(key, Integer.valueOf(value)); 
-                             break;
-                             
-                          case Double:
-                              cust = CustomAttribute.newDoubleAttribute(key, Double.valueOf(value));
-                              break;
-                          case Float:
-                              cust = CustomAttribute.newFloatAttribute(key, Float.valueOf(value));
-                              break;
-                              
-                          case Long:
-                              cust = CustomAttribute.newLongAttribute(key, Long.valueOf(value));
-                              break;
-                              
-                          case Boolean:
-                              if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
-                    cust = CustomAttribute.newBooleanAttribute(key, Boolean.valueOf(value));
-                }else{
-                          throw new IntercomValidationException("Datatype of '"+key+"' attribute is invalid! Row ID: "+this.user.getUserId()+" not updated.", "Datatype of '"+key+"' attribute is invalid!"+ 
-                            "Row ID: "+this.user.getUserId()+" not updated. \n boolean value ('true','false') expected, '"+value+"' found instead.",this.user.getUserId());
-                
-                }
-                      break;                              
-                      }
-                     
-                      if(cust==null) {
-                        throw new IntercomValidationException("Invalid custom column type of column '"+key+"'!", "Invalid custom column type of column '"+key+"'!" ,this.user.getUserId());
-                
-                      }
-                  }else{
-                    throw new IntercomValidationException("Column '"+mapping.getSrcCol()+"' does not exist in source data!", "Column '"+mapping.getSrcCol()+"' does not exist in source data!" ,this.user.getUserId());
-                
-                  }
-                      this.user.addCustomAttribute(cust);
-            
-             }
-         }
-         
-         return this;
-    }
-    
+	public UserObjectBuilder setUserCustomColumns(Map<String, String> userColValues,
+			List<CustomColumnMapping> columnMapping) throws IntercomValidationException {
+
+		String value;
+		if (columnMapping == null || columnMapping.isEmpty()) {
+			return this;
+		}
+		for (CustomColumnMapping mapping : columnMapping) {
+			CustomAttribute cust = null;
+			if (!userColValues.containsKey(mapping.getSrcCol())) {
+				throw new IntercomValidationException(
+						"Column '" + mapping.getSrcCol() + "' does not exist in source data!",
+						"Column '" + mapping.getSrcCol() + "' does not exist in source data!", this.user.getUserId());
+			}
+			value = userColValues.get(mapping.getSrcCol());
+			String key = mapping.getDestCol();
+
+			if (key == null || key.isEmpty() || key.equals("")) {
+				// set key if value is not specified
+				key = mapping.getSrcCol();
+			}
+			/* create attribute */
+			try{
+				switch (mapping.getDataType()) {
+				case String:
+					cust = CustomAttribute.newStringAttribute(key, value);
+					break;
+	
+				case Integer:
+					cust = CustomAttribute.newIntegerAttribute(key, Integer.valueOf(value));
+					break;
+	
+				case Double:
+					cust = CustomAttribute.newDoubleAttribute(key, Double.valueOf(value));
+					break;
+				case Float:
+					cust = CustomAttribute.newFloatAttribute(key, Float.valueOf(value));
+					break;
+	
+				case Long:
+					cust = CustomAttribute.newLongAttribute(key, Long.valueOf(value));
+					break;
+	
+				case Boolean:
+					if (value.equalsIgnoreCase("true") || value.equalsIgnoreCase("false")) {
+						cust = CustomAttribute.newBooleanAttribute(key, Boolean.valueOf(value));
+					} else {
+						throw new IntercomValidationException(
+								"Datatype of '" + key + "' attribute is invalid! Row ID: " + this.user.getUserId()
+										+ " not updated.",
+								"Datatype of '" + key + "' attribute is invalid!" + "Row ID: " + this.user.getUserId()
+										+ " not updated. \n boolean value ('true','false') expected, '" + value
+										+ "' found instead.",
+								this.user.getUserId());
+	
+					}
+					break;
+				}
+			} catch (Exception e) {
+				throw new IntercomValidationException(
+						"Invalid value of column '" + key + "'!", "Invalid custom column value of column '" + key
+								+ "'! Should be (" + mapping.getDataType() + "). ERROR: " + e.toString(),
+						this.user.getUserId());
+			}
+			if (cust == null) {
+				throw new IntercomValidationException("Invalid custom column type of column '" + key + "'!",
+						"Invalid custom column type of column '" + key + "'!", this.user.getUserId());
+
+			}
+			
+
+			this.user.addCustomAttribute(cust);
+
+		}
+
+		return this;
+	}
+
     public UserObjectBuilder setCompany(Map<String, String> lineValues, Map<CompanyStaticColumns, String> columnMapping, List<CustomColumnMapping> customColumns){
         if(columnMapping!=null && !columnMapping.isEmpty()){
             Company c = new CompanyObjectBuilder(lineValues, columnMapping).setCustomColumns(lineValues, customColumns).build();

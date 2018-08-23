@@ -15,7 +15,11 @@ public class ClientException extends KBCException{
 
     public ClientException(int severity, String detailedMessage, Object details, String message) {
     	super(message, detailedMessage, details, severity);
+    }
 
+    public ClientException(int severity, String detailedMessage, Object details, String message, Throwable cause) {
+    	super(message, detailedMessage, details, severity);
+    	this.initCause(cause);
     }
 
 }
